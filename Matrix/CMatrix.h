@@ -3,18 +3,28 @@
 
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
+template <typename T>
 class CMatrix2D
 {
 private:
     int rows;
     int cols;
-    std::vector<std::vector<int> > data;
+    std::vector<std::vector<T>> data;
 
 public:
+
     CMatrix2D(int pRows, int pCols);
 
-    int Get(int pRow, int pCol) const;
+    CMatrix2D(const CMatrix2D<T>& pCopyMatrix);
+
+    CMatrix2D(CMatrix2D<T>&& pCopyMatrix) noexcept;
+
+    virtual ~CMatrix2D() = default;
+
+    T Get(int pRow, int pCol) const;
 
     int GetRows() const;
 
@@ -22,11 +32,17 @@ public:
 
     std::pair<int,int> GetDimensions() const;
 
-    void Set(int pRow, int pCol, int pVal);
+    void Set(int pRow, int pCol, T pVal);
 
     void SetZerosMatrix();
 
     void SetOnesMatrix();
+
+    void Fill(T pScalar);
+
+    void Randomize();
+
+    bool Identity();
 
     bool IsZerosMatrix() const;
 
@@ -34,13 +50,28 @@ public:
 
     void OutPutMatrix();
 
-    CMatrix2D operator+(const CMatrix2D& pOther) const;
+    T operator()(int row, int col);
 
-    CMatrix2D operator*(float pScalar) const;
+    CMatrix2D<T>& Transpose();
 
-    CMatrix2D operator*(const CMatrix2D& pMatrix) const;
+    CMatrix2D<T>& operator=(const CMatrix2D<T>& pMatrix);
 
-    friend CMatrix2D operator*(float pScalar, const CMatrix2D& pMatrix);
+    CMatrix2D<T> operator+(const CMatrix2D<T>& pMatrix) const;
+
+    CMatrix2D<T>& operator+=(const CMatrix2D<T>& pMatrix);
+
+    CMatrix2D<T> operator-(const CMatrix2D<T>& pMatrix) const;
+
+    CMatrix2D<T>& operator-=(const CMatrix2D<T>& pMatrix);
+
+    CMatrix2D<T> operator*(T pScalar) const;
+
+    CMatrix2D<T> operator/(T pScalar) const;
+
+    CMatrix2D<T> operator*(const CMatrix2D<T>& pMatrix) const;
+
+    template <typename U>
+    friend CMatrix2D<U> operator*(U pScalar, const CMatrix2D<U>& pMatrix);
 };
 
 #endif

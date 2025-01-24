@@ -1,12 +1,33 @@
 #include "CMatrix.h"
 
-CMatrix2D::CMatrix2D(int pRows, int pCols) : rows(pRows),
+template <typename T>
+CMatrix2D<T>::CMatrix2D(int pRows, int pCols) : rows(pRows),
                                              cols(pCols)
 {
-    data.resize(rows, std::vector<int>(cols, 0));
+    data.resize(pRows, std::vector<T>(pCols, 0));
 }
 
-int CMatrix2D::Get(int pRow, int pCol) const
+template <typename T>
+CMatrix2D<T>::CMatrix2D(const CMatrix2D<T>& pCopyMatrix)
+{
+    for(int i = 0; i < rows; ++i)
+    {
+        for(int j = 0; j < cols; ++j)
+        {
+            this->Set(i,j,pCopyMatrix.Get(i,j));
+        }
+    }  
+}
+
+template <typename T>
+CMatrix2D<T>::CMatrix2D(CMatrix2D<T>&& pCopyMatrix) noexcept : rows(pCopyMatrix.rows), cols(pCopyMatrix.cols), data(std::move(pCopyMatrix.data))
+{
+    pCopyMatrix.rows = 0;
+    pCopyMatrix.cols = 0;
+}
+
+template <typename T>
+T CMatrix2D<T>::Get(int pRow, int pCol) const
 {
     if ((pRow < 0 || pRow >= rows) || (pCol < 0 || pCol >= cols))
     {
@@ -18,7 +39,8 @@ int CMatrix2D::Get(int pRow, int pCol) const
     }
 }
 
-void CMatrix2D::Set(int pRow, int pCol, int pVal)
+template <typename T>
+void CMatrix2D<T>::Set(int pRow, int pCol, T pVal)
 {
     if ((pRow < 0 || pRow >= rows) || (pCol < 0 || pCol >= cols))
     {
@@ -30,7 +52,8 @@ void CMatrix2D::Set(int pRow, int pCol, int pVal)
     }
 }
 
-void CMatrix2D::OutPutMatrix()
+template <typename T>
+void CMatrix2D<T>::OutPutMatrix()
 {
     for (int i = 0; i < rows; ++i)
     {
@@ -44,7 +67,8 @@ void CMatrix2D::OutPutMatrix()
     }
 }
 
-void CMatrix2D::SetZerosMatrix()
+template <typename T>
+void CMatrix2D<T>::SetZerosMatrix()
 {
     for(int i = 0; i < rows; ++i)
     {
@@ -55,7 +79,8 @@ void CMatrix2D::SetZerosMatrix()
     }  
 }
 
-bool CMatrix2D::IsZerosMatrix() const
+template <typename T>
+bool CMatrix2D<T>::IsZerosMatrix() const
 {
     for(int i = 0; i < rows; ++i)
     {
@@ -70,7 +95,8 @@ bool CMatrix2D::IsZerosMatrix() const
     return true;  
 }
 
-void CMatrix2D::SetOnesMatrix()
+template <typename T>
+void CMatrix2D<T>::SetOnesMatrix()
 {
     for(int i = 0; i < rows; ++i)
     {
@@ -81,7 +107,8 @@ void CMatrix2D::SetOnesMatrix()
     }  
 }
 
-bool CMatrix2D::IsOnesMatrix() const
+template <typename T>
+bool CMatrix2D<T>::IsOnesMatrix() const
 {
     for(int i = 0; i < rows; ++i)
     {
@@ -96,27 +123,80 @@ bool CMatrix2D::IsOnesMatrix() const
     return true;  
 }
 
-int CMatrix2D::GetRows() const
+template <typename T>
+void CMatrix2D<T>::Fill(T pScalar)
+{
+    for(int i = 0; i < this->GetRows(); ++i)
+    {
+        for(int j = 0; j < this->GetCols(); ++j)
+        {
+            this->Set(i,j,pScalar);
+        }
+    }    
+}
+
+template <typename T>
+void CMatrix2D<T>::Randomize()
+{
+    srand(time(NULL)); 
+
+    for(int i = 0; i < this->GetRows(); ++i)
+    {
+        for(int j = 0; j < this->GetCols(); ++j)
+        {
+            this->Set(i,j,rand() % 1000);
+        }
+    }
+}
+
+template <typename T>
+bool CMatrix2D<T>::Identity()
+{
+    if(this->GetCols() != this->GetRows())
+    {
+        return false;
+    }
+
+    this->SetZerosMatrix();
+
+    for(int i = 0; i < this->GetRows(); ++i)
+    {
+        for(int j = 0; j < this->GetCols(); ++j)
+        {
+            if(i == j)
+            {
+                this->Set(i,j,1);
+            }
+        }
+    }
+    return true;
+}
+
+template <typename T>
+int CMatrix2D<T>::GetRows() const
 {
     return this->rows;
 }
 
-int CMatrix2D::GetCols() const
+template <typename T>
+int CMatrix2D<T>::GetCols() const
 {
     return this->cols;
 }
 
-std::pair<int,int> CMatrix2D::GetDimensions() const
+template <typename T>
+std::pair<int,int> CMatrix2D<T>::GetDimensions() const
 {
     return std::pair<int,int>(rows,cols);
 }
 
-CMatrix2D CMatrix2D::operator+(const CMatrix2D& pOther) const
+template <typename T>
+CMatrix2D<T> CMatrix2D<T>::operator+(const CMatrix2D<T>& pMatrix) const
 {
-    CMatrix2D SumMatrix(rows, cols);
+    CMatrix2D<T> SumMatrix(rows, cols);
     SumMatrix.SetZerosMatrix();
 
-    if(pOther.GetDimensions() != this->GetDimensions())
+    if(pMatrix.GetDimensions() != this->GetDimensions())
     {
         return SumMatrix;
     }
@@ -124,15 +204,62 @@ CMatrix2D CMatrix2D::operator+(const CMatrix2D& pOther) const
     {
         for(int j = 0; j < cols; ++j)
         {
-            SumMatrix.Set(i,j,pOther.Get(i,j) + this->Get(i,j));
+            SumMatrix.Set(i,j,pMatrix.Get(i,j) + this->Get(i,j));
         }
     }
     return SumMatrix;
 }
 
-CMatrix2D CMatrix2D::operator*(float pScalar) const
+template <typename T>
+CMatrix2D<T>& CMatrix2D<T>::operator+=(const CMatrix2D<T>& pMatrix)
 {
-    CMatrix2D MultMatrix(rows, cols);
+    for(int i = 0; i < this->GetRows(); ++i)
+    {
+        for(int j = 0; j < this->GetCols(); ++j)
+        {
+            this->Set(i,j,pMatrix.Get(i,j) + this->Get(i,j));
+        }
+    }
+    return *this;    
+}
+
+template <typename T>
+CMatrix2D<T> CMatrix2D<T>::operator-(const CMatrix2D<T>& pMatrix) const
+{
+    CMatrix2D<T> SumMatrix(rows, cols);
+    SumMatrix.SetZerosMatrix();
+
+    if(pMatrix.GetDimensions() != this->GetDimensions())
+    {
+        return SumMatrix;
+    }
+    for(int i = 0; i < rows; ++i)
+    {
+        for(int j = 0; j < cols; ++j)
+        {
+            SumMatrix.Set(i,j,this->Get(i,j) - pMatrix.Get(i,j));
+        }
+    }
+    return SumMatrix;
+}
+
+template <typename T>
+CMatrix2D<T>& CMatrix2D<T>::operator-=(const CMatrix2D<T>& pMatrix)
+{
+    for(int i = 0; i < this->GetRows(); ++i)
+    {
+        for(int j = 0; j < this->GetCols(); ++j)
+        {
+            this->Set(i,j,this->Get(i,j) - pMatrix.Get(i,j));
+        }
+    }
+    return *this;    
+}
+
+template <typename T>
+CMatrix2D<T> CMatrix2D<T>::operator*(T pScalar) const
+{
+    CMatrix2D<T> MultMatrix(rows, cols);
     MultMatrix.SetZerosMatrix();
 
     for(int i = 0; i < rows; ++i)
@@ -146,9 +273,10 @@ CMatrix2D CMatrix2D::operator*(float pScalar) const
     return MultMatrix;
 }
 
-CMatrix2D operator*(float pScalar, const CMatrix2D& pMatrix)
+template <typename T>
+CMatrix2D<T> operator*(T pScalar, const CMatrix2D<T>& pMatrix)
 {
-    CMatrix2D MultMatrix(pMatrix.GetRows(), pMatrix.GetCols());
+    CMatrix2D<T> MultMatrix(pMatrix.GetRows(), pMatrix.GetCols());
     MultMatrix.SetZerosMatrix();
 
     for(int i = 0; i < pMatrix.GetRows(); ++i)
@@ -162,9 +290,29 @@ CMatrix2D operator*(float pScalar, const CMatrix2D& pMatrix)
     return MultMatrix;
 }
 
-CMatrix2D CMatrix2D::operator*(const CMatrix2D& pMatrix) const
+template <typename T>
+CMatrix2D<T> CMatrix2D<T>::operator/(T pScalar) const
 {
-    CMatrix2D MultMatrix(pMatrix.GetRows(), pMatrix.GetCols());
+    CMatrix2D<T> DivMatrix(rows, cols);
+    DivMatrix.SetZerosMatrix();
+
+    if(pScalar == 0) return DivMatrix;
+
+    for(int i = 0; i < rows; ++i)
+    {
+        for(int j = 0; j < cols; ++j)
+        {
+            DivMatrix.Set(i,j,this->Get(i,j) / pScalar);
+        }
+    }
+
+    return DivMatrix;
+}
+
+template <typename T>
+CMatrix2D<T> CMatrix2D<T>::operator*(const CMatrix2D<T>& pMatrix) const
+{
+    CMatrix2D<T> MultMatrix(pMatrix.GetRows(), pMatrix.GetCols());
     MultMatrix.SetZerosMatrix();
 
     if(this->GetCols() != pMatrix.GetRows())
@@ -187,3 +335,51 @@ CMatrix2D CMatrix2D::operator*(const CMatrix2D& pMatrix) const
     }
     return MultMatrix;
 }
+
+template <typename T>
+CMatrix2D<T>& CMatrix2D<T>::operator=(const CMatrix2D<T>& pMatrix)
+{
+
+    if(pMatrix.GetDimensions() != this->GetDimensions())
+    {
+        this->data.resize(pMatrix.GetRows(), std::vector<T>(pMatrix.GetCols(), 0));
+        this->rows = pMatrix.GetRows();
+        this->cols = pMatrix.GetCols();
+    }
+
+    for(int i = 0; i < this->GetRows(); ++i)
+    {
+        for(int j = 0; j < this->GetCols(); ++j)
+        {
+            this->Set(i,j,pMatrix.Get(i,j));
+        }
+    }
+
+    return *this;    
+}
+
+template <typename T>
+CMatrix2D<T>& CMatrix2D<T>::Transpose()
+{
+    CMatrix2D<T> tempMat(this->GetCols(),this->GetRows());
+
+    for (int i = 0; i < this->GetRows(); ++i)
+    {
+        for (int j = 0; j < this->GetCols(); ++j)
+        {
+            tempMat.Set(j, i, this->Get(i, j));
+        }
+    }
+
+    *this = tempMat;
+
+    return *this; 
+}
+
+template class CMatrix2D<int>;
+template class CMatrix2D<float>;
+template class CMatrix2D<double>;
+
+template CMatrix2D<int> operator*(int, const CMatrix2D<int>&);
+template CMatrix2D<float> operator*(float, const CMatrix2D<float>&);
+template CMatrix2D<double> operator*(double, const CMatrix2D<double>&);
