@@ -1,5 +1,6 @@
 #include "CMatrix.h"
 
+// Constructor
 template <typename T>
 CMatrix2D<T>::CMatrix2D(int pRows, int pCols) : rows(pRows),
                                              cols(pCols)
@@ -7,6 +8,7 @@ CMatrix2D<T>::CMatrix2D(int pRows, int pCols) : rows(pRows),
     data.resize(pRows, std::vector<T>(pCols, 0));
 }
 
+// Copy Constructor
 template <typename T>
 CMatrix2D<T>::CMatrix2D(const CMatrix2D<T>& pCopyMatrix)
 {
@@ -19,6 +21,7 @@ CMatrix2D<T>::CMatrix2D(const CMatrix2D<T>& pCopyMatrix)
     }  
 }
 
+// Move Constructor
 template <typename T>
 CMatrix2D<T>::CMatrix2D(CMatrix2D<T>&& pCopyMatrix) noexcept : rows(pCopyMatrix.rows), cols(pCopyMatrix.cols), data(std::move(pCopyMatrix.data))
 {
@@ -26,6 +29,7 @@ CMatrix2D<T>::CMatrix2D(CMatrix2D<T>&& pCopyMatrix) noexcept : rows(pCopyMatrix.
     pCopyMatrix.cols = 0;
 }
 
+// Gets a specific value from the matrix
 template <typename T>
 T CMatrix2D<T>::Get(int pRow, int pCol) const
 {
@@ -39,6 +43,7 @@ T CMatrix2D<T>::Get(int pRow, int pCol) const
     }
 }
 
+// Sets a specific element of the matrix to a certain value
 template <typename T>
 void CMatrix2D<T>::Set(int pRow, int pCol, T pVal)
 {
@@ -52,6 +57,7 @@ void CMatrix2D<T>::Set(int pRow, int pCol, T pVal)
     }
 }
 
+// Prints the matirx's content
 template <typename T>
 void CMatrix2D<T>::OutPutMatrix()
 {
@@ -67,6 +73,7 @@ void CMatrix2D<T>::OutPutMatrix()
     }
 }
 
+// Sets all elements of the matrix to zero
 template <typename T>
 void CMatrix2D<T>::SetZerosMatrix()
 {
@@ -79,6 +86,7 @@ void CMatrix2D<T>::SetZerosMatrix()
     }  
 }
 
+// Checks if the matrix is a zero matrix
 template <typename T>
 bool CMatrix2D<T>::IsZerosMatrix() const
 {
@@ -95,6 +103,7 @@ bool CMatrix2D<T>::IsZerosMatrix() const
     return true;  
 }
 
+// Sets all elements of the matrix to one
 template <typename T>
 void CMatrix2D<T>::SetOnesMatrix()
 {
@@ -107,6 +116,7 @@ void CMatrix2D<T>::SetOnesMatrix()
     }  
 }
 
+// Check if the matrix is a ones matrix
 template <typename T>
 bool CMatrix2D<T>::IsOnesMatrix() const
 {
@@ -123,6 +133,7 @@ bool CMatrix2D<T>::IsOnesMatrix() const
     return true;  
 }
 
+// Fill all elements of a matrix with a specific value
 template <typename T>
 void CMatrix2D<T>::Fill(T pScalar)
 {
@@ -135,6 +146,7 @@ void CMatrix2D<T>::Fill(T pScalar)
     }    
 }
 
+// Fill the matrix with random values between 0 and 999
 template <typename T>
 void CMatrix2D<T>::Randomize()
 {
@@ -149,6 +161,8 @@ void CMatrix2D<T>::Randomize()
     }
 }
 
+// Set the matrix to the identity matrix (needs to be a square matrix) 
+// return true if it is a square matrix, false if it is not
 template <typename T>
 bool CMatrix2D<T>::Identity()
 {
@@ -172,24 +186,28 @@ bool CMatrix2D<T>::Identity()
     return true;
 }
 
+// Get the number of rows of a matrix
 template <typename T>
 int CMatrix2D<T>::GetRows() const
 {
     return this->rows;
 }
 
+// Get the number of columns of a matrix
 template <typename T>
 int CMatrix2D<T>::GetCols() const
 {
     return this->cols;
 }
 
+// Get the dimensions of the matrix as a (row,cols) pair
 template <typename T>
 std::pair<int,int> CMatrix2D<T>::GetDimensions() const
 {
     return std::pair<int,int>(rows,cols);
 }
 
+// Override of the + operator to allow matrix addition
 template <typename T>
 CMatrix2D<T> CMatrix2D<T>::operator+(const CMatrix2D<T>& pMatrix) const
 {
@@ -210,6 +228,7 @@ CMatrix2D<T> CMatrix2D<T>::operator+(const CMatrix2D<T>& pMatrix) const
     return SumMatrix;
 }
 
+// Override of the += operator to allow matrix addition
 template <typename T>
 CMatrix2D<T>& CMatrix2D<T>::operator+=(const CMatrix2D<T>& pMatrix)
 {
@@ -223,6 +242,7 @@ CMatrix2D<T>& CMatrix2D<T>::operator+=(const CMatrix2D<T>& pMatrix)
     return *this;    
 }
 
+// Override of the - operator to allow matrix substraction
 template <typename T>
 CMatrix2D<T> CMatrix2D<T>::operator-(const CMatrix2D<T>& pMatrix) const
 {
@@ -243,6 +263,7 @@ CMatrix2D<T> CMatrix2D<T>::operator-(const CMatrix2D<T>& pMatrix) const
     return SumMatrix;
 }
 
+// Override of the -= operator to allow matrix substraction
 template <typename T>
 CMatrix2D<T>& CMatrix2D<T>::operator-=(const CMatrix2D<T>& pMatrix)
 {
@@ -256,6 +277,7 @@ CMatrix2D<T>& CMatrix2D<T>::operator-=(const CMatrix2D<T>& pMatrix)
     return *this;    
 }
 
+// Override of the * operator to multiply all elements of a matrix by a scalar (mat * scalar)
 template <typename T>
 CMatrix2D<T> CMatrix2D<T>::operator*(T pScalar) const
 {
@@ -273,6 +295,7 @@ CMatrix2D<T> CMatrix2D<T>::operator*(T pScalar) const
     return MultMatrix;
 }
 
+// Override of the * operator to multiply all elements of a matrix by a scalar (for commutative multiplication scalar * mat)
 template <typename T>
 CMatrix2D<T> operator*(T pScalar, const CMatrix2D<T>& pMatrix)
 {
@@ -290,6 +313,7 @@ CMatrix2D<T> operator*(T pScalar, const CMatrix2D<T>& pMatrix)
     return MultMatrix;
 }
 
+// Override of the / operator to divide all elements of a matrix by a scalar
 template <typename T>
 CMatrix2D<T> CMatrix2D<T>::operator/(T pScalar) const
 {
@@ -309,6 +333,7 @@ CMatrix2D<T> CMatrix2D<T>::operator/(T pScalar) const
     return DivMatrix;
 }
 
+// Matrix multiplication A * B with A_number_of_cols = B_number_of_rows
 template <typename T>
 CMatrix2D<T> CMatrix2D<T>::operator*(const CMatrix2D<T>& pMatrix) const
 {
@@ -336,12 +361,14 @@ CMatrix2D<T> CMatrix2D<T>::operator*(const CMatrix2D<T>& pMatrix) const
     return MultMatrix;
 }
 
+// Assigns the values of the given matrix (pMatrix) to the current matrix (*this).
 template <typename T>
 CMatrix2D<T>& CMatrix2D<T>::operator=(const CMatrix2D<T>& pMatrix)
 {
 
     if(pMatrix.GetDimensions() != this->GetDimensions())
     {
+        // Resize the matrix if the the old structure is incompatible with the new one
         this->data.resize(pMatrix.GetRows(), std::vector<T>(pMatrix.GetCols(), 0));
         this->rows = pMatrix.GetRows();
         this->cols = pMatrix.GetCols();
@@ -358,6 +385,7 @@ CMatrix2D<T>& CMatrix2D<T>::operator=(const CMatrix2D<T>& pMatrix)
     return *this;    
 }
 
+// Transposes the matrix
 template <typename T>
 CMatrix2D<T>& CMatrix2D<T>::Transpose()
 {
